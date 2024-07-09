@@ -7,11 +7,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 )
+
 type Weather struct {
 	Location struct {
 		Name    string  `json:"name"`
@@ -78,9 +80,9 @@ func main() {
 	var input string
 
 	cyan := color.New(color.FgCyan).PrintlnFunc()
-    red := color.New(color.FgRed).PrintlnFunc()
-    green := color.New(color.FgGreen).PrintlnFunc()
-    yellow := color.New(color.FgYellow).PrintlnFunc()
+	red := color.New(color.FgRed).PrintlnFunc()
+	green := color.New(color.FgGreen).PrintlnFunc()
+	yellow := color.New(color.FgYellow).PrintlnFunc()
 	blue := color.New(color.FgBlue).PrintlnFunc()
 	purple := color.New(color.FgMagenta).PrintlnFunc()
 
@@ -94,34 +96,38 @@ func main() {
 		log.Fatal("API_KEY not set in .env file")
 	}
 
-	purple("Enter your city name")
-	fmt.Scanln(&input)
-	if err != nil {
-		log.Fatal("An Error occured :", err)
-	}
-	if input == "" {
-		// Empty Input
-		input = "London" // Defaulting to London
-		red("No City name Provided. Choose Any from the below list\n")
-		blue("1.Varanasi\n2.Paris\n3.New York\n4.Moscow")
-		var option string
-		fmt.Scanln(&option)
-		if option == "" {
-			yellow("No Options chosen. You lazy Bastard :/ :/ ........ \nDefaulting to London ........")
-			input = "London"
-		} else {
-			if option == "1" {
-				input = "Varanasi"
-			} else if option == "2" {
-				input = "Paris"
-			} else if option == "3" {
-				input = "New York"
-			} else if option == "4" {
-				input = "Moscow"
-			} else {
-				red("My Champagne Lover!! Please choose a correct option next time. Will you? :/ \n Defaulting to London !! :/ .....\n")
-				time.Sleep(2 * time.Second)
+	if len(os.Args) >= 2 {
+		input = os.Args[1]
+	} else {
+		purple("Enter your city name")
+		fmt.Scanln(&input)
+		if err != nil {
+			log.Fatal("An Error occured :", err)
+		}
+		if input == "" {
+			// Empty Input
+			input = "London" // Defaulting to London
+			red("No City name Provided. Choose Any from the below list\n")
+			blue("1.Varanasi\n2.Paris\n3.New York\n4.Moscow")
+			var option string
+			fmt.Scanln(&option)
+			if option == "" {
+				yellow("No Options chosen. You lazy Bastard :/ :/ ........ \nDefaulting to London ........")
 				input = "London"
+			} else {
+				if option == "1" {
+					input = "Varanasi"
+				} else if option == "2" {
+					input = "Paris"
+				} else if option == "3" {
+					input = "New York"
+				} else if option == "4" {
+					input = "Moscow"
+				} else {
+					red("My Champagne Lover!! Please choose a correct option next time. Will you? :/ \n Defaulting to Varanasi !! :/ .....\n")
+					time.Sleep(2 * time.Second)
+					input = "Varanasi"
+				}
 			}
 		}
 	}
@@ -143,7 +149,7 @@ func main() {
 	}
 	json.Unmarshal(body, &weather)
 
-	heading := fmt.Sprintf("\n------------------------------More Information on %s------------------------------\n", input)
+	heading := fmt.Sprintf("\n------------------------------More Information on %s------------------------------\n", strings.ToUpper(input))
 	red(heading)
 	cyan("Location: ", weather.Location.Name)
 	cyan("Region: ", weather.Location.Region)
@@ -161,20 +167,24 @@ func main() {
 	cyan("Condition: ", weather.Current.Condition.Text)
 	cyan("Dew Point: ", weather.Current.DewPoint)
 	red("\n------------------------------Forecast------------------------------\n")
-	yellow("Max Daily Temperature", weather.Forecast.ForecastDay[0].Day.MaxtempC)
-	yellow("Min Daily Temperature ", weather.Forecast.ForecastDay[0].Day.MintempC)
-	yellow("Average Daily Temperature ", weather.Forecast.ForecastDay[0].Day.AvgtempC)
-	yellow("Max Wind Speed ", weather.Forecast.ForecastDay[0].Day.MaxwindMph)
-	yellow("Total Precipitation ", weather.Forecast.ForecastDay[0].Day.TotalprecipMm)
-	yellow("Total Snow ", weather.Forecast.ForecastDay[0].Day.TotalsnowCm)
-	yellow("Average Humidity ", weather.Forecast.ForecastDay[0].Day.AvgHumidity)
-	yellow("Condition ", weather.Forecast.ForecastDay[0].Day.Condition.Text)
-	yellow("UV ", weather.Forecast.ForecastDay[0].Day.UV)
+	if len(weather.Forecast.ForecastDay) > 0 {
+		yellow("Max Daily Temperature", weather.Forecast.ForecastDay[0].Day.MaxtempC)
+		yellow("Min Daily Temperature ", weather.Forecast.ForecastDay[0].Day.MintempC)
+		yellow("Average Daily Temperature ", weather.Forecast.ForecastDay[0].Day.AvgtempC)
+		yellow("Max Wind Speed ", weather.Forecast.ForecastDay[0].Day.MaxwindMph)
+		yellow("Total Precipitation ", weather.Forecast.ForecastDay[0].Day.TotalprecipMm)
+		yellow("Total Snow ", weather.Forecast.ForecastDay[0].Day.TotalsnowCm)
+		yellow("Average Humidity ", weather.Forecast.ForecastDay[0].Day.AvgHumidity)
+		yellow("Condition ", weather.Forecast.ForecastDay[0].Day.Condition.Text)
+		yellow("UV ", weather.Forecast.ForecastDay[0].Day.UV)
+	}
 	red("\n------------------------------Astro------------------------------\n")
-	green("Sunrise ", weather.Forecast.ForecastDay[0].Astro.Sunrise)
-	green("Sunset ", weather.Forecast.ForecastDay[0].Astro.Sunset)
-	green("Moonrise ", weather.Forecast.ForecastDay[0].Astro.Moonrise)
-	green("Moonset ", weather.Forecast.ForecastDay[0].Astro.Moonset)
+	if len(weather.Forecast.ForecastDay) > 0 {
+		green("Sunrise ", weather.Forecast.ForecastDay[0].Astro.Sunrise)
+		green("Sunset ", weather.Forecast.ForecastDay[0].Astro.Sunset)
+		green("Moonrise ", weather.Forecast.ForecastDay[0].Astro.Moonrise)
+		green("Moonset ", weather.Forecast.ForecastDay[0].Astro.Moonset)
+	}
 	green("\n------------------------------Hourly Forecast------------------------------\n")
 	for i := 0; i < 24; i++ {
 		blue("Time: ", weather.Forecast.ForecastDay[0].Hour[i].Time)

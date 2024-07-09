@@ -1,4 +1,4 @@
-module Sweetdevil/weather-forcast
+module Sweetdevil/weather-forecast
 
 go 1.22.2
 
