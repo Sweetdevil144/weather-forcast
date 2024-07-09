@@ -7,10 +7,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 )
-
 type Weather struct {
 	Location struct {
 		Name    string  `json:"name"`
@@ -76,9 +77,16 @@ func main() {
 	var weather Weather
 	var input string
 
+	cyan := color.New(color.FgCyan).PrintlnFunc()
+    red := color.New(color.FgRed).PrintlnFunc()
+    green := color.New(color.FgGreen).PrintlnFunc()
+    yellow := color.New(color.FgYellow).PrintlnFunc()
+	blue := color.New(color.FgBlue).PrintlnFunc()
+	purple := color.New(color.FgMagenta).PrintlnFunc()
+
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		log.Fatal("Error loading .env file: %v", err)
 	}
 
 	apiKey := os.Getenv("API_KEY")
@@ -86,7 +94,7 @@ func main() {
 		log.Fatal("API_KEY not set in .env file")
 	}
 
-	fmt.Println("Enter your city name")
+	purple("Enter your city name")
 	fmt.Scanln(&input)
 	if err != nil {
 		log.Fatal("An Error occured :", err)
@@ -94,12 +102,12 @@ func main() {
 	if input == "" {
 		// Empty Input
 		input = "London" // Defaulting to London
-		fmt.Println("No City name Provided. Choose Any from the below list")
-		fmt.Println("1.Varanasi\n2.Paris\n3.New York\n4.Moscow")
+		red("No City name Provided. Choose Any from the below list\n")
+		blue("1.Varanasi\n2.Paris\n3.New York\n4.Moscow")
 		var option string
 		fmt.Scanln(&option)
 		if option == "" {
-			fmt.Println("No Options chosen. You lazy Bastard :/ :/ ........ \nDefaulting to London ........")
+			yellow("No Options chosen. You lazy Bastard :/ :/ ........ \nDefaulting to London ........")
 			input = "London"
 		} else {
 			if option == "1" {
@@ -111,7 +119,8 @@ func main() {
 			} else if option == "4" {
 				input = "Moscow"
 			} else {
-				fmt.Println("My Chanpagne Lover!! Please choose a correct option next time. Will you? :/ \n Defaulting to London !! :/ .....")
+				red("My Champagne Lover!! Please choose a correct option next time. Will you? :/ \n Defaulting to London !! :/ .....\n")
+				time.Sleep(2 * time.Second)
 				input = "London"
 			}
 		}
@@ -133,53 +142,54 @@ func main() {
 		panic(err)
 	}
 	json.Unmarshal(body, &weather)
+
 	heading := fmt.Sprintf("\n------------------------------More Information on %s------------------------------\n", input)
-	fmt.Println(heading)
-	fmt.Println("Location: ", weather.Location.Name)
-	fmt.Println("Region: ", weather.Location.Region)
-	fmt.Println("Country: ", weather.Location.Country)
-	fmt.Println("Latitude: ", weather.Location.Lat)
-	fmt.Println("Longitude: ", weather.Location.Lon)
-	fmt.Println("Temperature: ", weather.Current.TempC)
-	fmt.Println("Wind Speed: ", weather.Current.WindMph)
-	fmt.Println("Wind Degree: ", weather.Current.WindDegree)
-	fmt.Println("Pressure: ", weather.Current.Pressure)
-	fmt.Println("Precipitation: ", weather.Current.PrecipMm)
-	fmt.Println("Cloud: ", weather.Current.Cloud)
-	fmt.Println("Feels Like: ", weather.Current.FeelslikeC)
-	fmt.Println("Heat Index: ", weather.Current.HeatindexC)
-	fmt.Println("Condition: ", weather.Current.Condition.Text)
-	fmt.Println("Dew Point: ", weather.Current.DewPoint)
-	fmt.Println("\n------------------------------Forecast------------------------------\n")
-	fmt.Println("Max Daily Temperature", weather.Forecast.ForecastDay[0].Day.MaxtempC)
-	fmt.Println("Min Daily Temperature ", weather.Forecast.ForecastDay[0].Day.MintempC)
-	fmt.Println("Average Daily Temperature ", weather.Forecast.ForecastDay[0].Day.AvgtempC)
-	fmt.Println("Max Wind Speed ", weather.Forecast.ForecastDay[0].Day.MaxwindMph)
-	fmt.Println("Total Precipitation ", weather.Forecast.ForecastDay[0].Day.TotalprecipMm)
-	fmt.Println("Total Snow ", weather.Forecast.ForecastDay[0].Day.TotalsnowCm)
-	fmt.Println("Average Humidity ", weather.Forecast.ForecastDay[0].Day.AvgHumidity)
-	fmt.Println("Condition ", weather.Forecast.ForecastDay[0].Day.Condition.Text)
-	fmt.Println("UV ", weather.Forecast.ForecastDay[0].Day.UV)
-	fmt.Println("\n------------------------------Astro------------------------------\n")
-	fmt.Println("Sunrise ", weather.Forecast.ForecastDay[0].Astro.Sunrise)
-	fmt.Println("Sunset ", weather.Forecast.ForecastDay[0].Astro.Sunset)
-	fmt.Println("Moonrise ", weather.Forecast.ForecastDay[0].Astro.Moonrise)
-	fmt.Println("Moonset ", weather.Forecast.ForecastDay[0].Astro.Moonset)
-	fmt.Println("\n------------------------------Hourly Forecast------------------------------\n")
+	red(heading)
+	cyan("Location: ", weather.Location.Name)
+	cyan("Region: ", weather.Location.Region)
+	cyan("Country: ", weather.Location.Country)
+	cyan("Latitude: ", weather.Location.Lat)
+	cyan("Longitude: ", weather.Location.Lon)
+	cyan("Temperature: ", weather.Current.TempC)
+	cyan("Wind Speed: ", weather.Current.WindMph)
+	cyan("Wind Degree: ", weather.Current.WindDegree)
+	cyan("Pressure: ", weather.Current.Pressure)
+	cyan("Precipitation: ", weather.Current.PrecipMm)
+	cyan("Cloud: ", weather.Current.Cloud)
+	cyan("Feels Like: ", weather.Current.FeelslikeC)
+	cyan("Heat Index: ", weather.Current.HeatindexC)
+	cyan("Condition: ", weather.Current.Condition.Text)
+	cyan("Dew Point: ", weather.Current.DewPoint)
+	red("\n------------------------------Forecast------------------------------\n")
+	yellow("Max Daily Temperature", weather.Forecast.ForecastDay[0].Day.MaxtempC)
+	yellow("Min Daily Temperature ", weather.Forecast.ForecastDay[0].Day.MintempC)
+	yellow("Average Daily Temperature ", weather.Forecast.ForecastDay[0].Day.AvgtempC)
+	yellow("Max Wind Speed ", weather.Forecast.ForecastDay[0].Day.MaxwindMph)
+	yellow("Total Precipitation ", weather.Forecast.ForecastDay[0].Day.TotalprecipMm)
+	yellow("Total Snow ", weather.Forecast.ForecastDay[0].Day.TotalsnowCm)
+	yellow("Average Humidity ", weather.Forecast.ForecastDay[0].Day.AvgHumidity)
+	yellow("Condition ", weather.Forecast.ForecastDay[0].Day.Condition.Text)
+	yellow("UV ", weather.Forecast.ForecastDay[0].Day.UV)
+	red("\n------------------------------Astro------------------------------\n")
+	green("Sunrise ", weather.Forecast.ForecastDay[0].Astro.Sunrise)
+	green("Sunset ", weather.Forecast.ForecastDay[0].Astro.Sunset)
+	green("Moonrise ", weather.Forecast.ForecastDay[0].Astro.Moonrise)
+	green("Moonset ", weather.Forecast.ForecastDay[0].Astro.Moonset)
+	green("\n------------------------------Hourly Forecast------------------------------\n")
 	for i := 0; i < 24; i++ {
-		fmt.Println("Time: ", weather.Forecast.ForecastDay[0].Hour[i].Time)
-		fmt.Println("Condition: ", weather.Forecast.ForecastDay[0].Hour[i].Condition.Text)
-		fmt.Println("Feels Like: ", weather.Forecast.ForecastDay[0].Hour[i].FeelslikeC)
-		fmt.Println("Humidity: ", weather.Forecast.ForecastDay[0].Hour[i].Humidity)
-		fmt.Println("Cloud: ", weather.Forecast.ForecastDay[0].Hour[i].Cloud)
-		fmt.Println("Will It Rain: ", weather.Forecast.ForecastDay[0].Hour[i].WillItRain)
-		fmt.Println("Wind Speed: ", weather.Forecast.ForecastDay[0].Hour[i].WindMph)
-		fmt.Println("Will It Snow: ", weather.Forecast.ForecastDay[0].Hour[i].WillItSnow)
-		fmt.Println("UV: ", weather.Forecast.ForecastDay[0].Hour[i].UV)
+		blue("Time: ", weather.Forecast.ForecastDay[0].Hour[i].Time)
+		purple("Condition: ", weather.Forecast.ForecastDay[0].Hour[i].Condition.Text)
+		blue("Feels Like: ", weather.Forecast.ForecastDay[0].Hour[i].FeelslikeC)
+		purple("Humidity: ", weather.Forecast.ForecastDay[0].Hour[i].Humidity)
+		blue("Cloud: ", weather.Forecast.ForecastDay[0].Hour[i].Cloud)
+		purple("Will It Rain: ", weather.Forecast.ForecastDay[0].Hour[i].WillItRain)
+		blue("Wind Speed: ", weather.Forecast.ForecastDay[0].Hour[i].WindMph)
+		purple("Will It Snow: ", weather.Forecast.ForecastDay[0].Hour[i].WillItSnow)
+		blue("UV: ", weather.Forecast.ForecastDay[0].Hour[i].UV)
 		if i < 23 {
-			fmt.Println("\n-------------------------------------Next Hour Forecast-------------------------------------")
+			red("\n-------------------------------------Next Hour Forecast-------------------------------------")
 		} else {
-			fmt.Println("\n------------------------------End of Forecast------------------------------")
+			red("\n------------------------------End of Forecast------------------------------")
 		}
 	}
 }
